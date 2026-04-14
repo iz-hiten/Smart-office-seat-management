@@ -159,8 +159,8 @@ export const AdminPanel: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-4 space-y-6">
-      <header className="flex items-center justify-between glass p-6 rounded-2xl">
+    <div className="w-full mx-auto p-4 md:p-6 space-y-6 max-w-7xl">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass p-6 rounded-2xl">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Settings className="w-6 h-6 text-indigo-400" />
@@ -168,30 +168,30 @@ export const AdminPanel: React.FC = () => {
           </h1>
           <p className="text-slate-400 text-sm">Manage users, seats, and system configuration</p>
         </div>
-        <Button variant="outline" size="sm" onClick={fetchData} disabled={loading} className="glass">
+        <Button variant="outline" size="sm" onClick={fetchData} disabled={loading} className="glass shrink-0">
           <RefreshCw className={cn("w-4 h-4 mr-2", loading && "animate-spin")} />
           Refresh Data
         </Button>
       </header>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="glass p-1 bg-white/5 w-full justify-start overflow-x-auto">
-          <TabsTrigger value="overview" className="gap-2">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 w-full">
+        <TabsList className="glass p-1 bg-white/5 w-full justify-start overflow-x-auto flex-nowrap">
+          <TabsTrigger value="overview" className="gap-2 whitespace-nowrap">
             <CalendarCheck className="w-4 h-4" /> Overview
           </TabsTrigger>
-          <TabsTrigger value="users" className="gap-2">
+          <TabsTrigger value="users" className="gap-2 whitespace-nowrap">
             <Users className="w-4 h-4" /> User Management
           </TabsTrigger>
-          <TabsTrigger value="seats" className="gap-2">
+          <TabsTrigger value="seats" className="gap-2 whitespace-nowrap">
             <Armchair className="w-4 h-4" /> Seat Management
           </TabsTrigger>
-          <TabsTrigger value="system" className="gap-2">
+          <TabsTrigger value="system" className="gap-2 whitespace-nowrap">
             <Database className="w-4 h-4" /> System Settings
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <TabsContent value="overview" className="space-y-6 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
             <Card className="glass border-white/5">
               <CardHeader className="pb-2">
                 <CardDescription>Total Registered Users</CardDescription>
@@ -212,7 +212,7 @@ export const AdminPanel: React.FC = () => {
             </Card>
           </div>
 
-          <Card className="glass border-white/5">
+          <Card className="glass border-white/5 w-full">
             <CardHeader>
               <CardTitle>Today's Bookings ({formatDate(new Date())})</CardTitle>
             </CardHeader>
@@ -326,50 +326,73 @@ export const AdminPanel: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="seats" className="space-y-4">
-          <Card className="glass border-white/5">
-            <CardHeader>
-              <CardTitle>Seat Inventory</CardTitle>
-              <CardDescription>Overview of all physical seats in the office</CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left">
-                  <thead className="text-xs uppercase text-slate-400 border-b border-white/10">
-                    <tr>
-                      <th className="px-6 py-4">ID</th>
-                      <th className="px-6 py-4">Number</th>
-                      <th className="px-6 py-4">Type</th>
-                      <th className="px-6 py-4">Squad Assignment</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5">
-                    {seats.map((seat) => (
-                      <tr key={seat.id} className="hover:bg-white/5 transition-colors">
-                        <td className="px-6 py-4 font-mono font-bold text-indigo-400">{seat.id}</td>
-                        <td className="px-6 py-4">{seat.number}</td>
-                        <td className="px-6 py-4">
-                          <Badge className={cn(
-                            seat.type === 'floater' ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/30" : "bg-indigo-500/20 text-indigo-300 border-indigo-500/30"
-                          )}>
-                            {seat.type}
-                          </Badge>
-                        </td>
-                        <td className="px-6 py-4">
-                          {seat.squadId ? (
-                            <Badge variant="outline" className="border-white/10">
-                              {SQUADS.find(s => s.id === seat.squadId)?.name || seat.squadId}
-                            </Badge>
-                          ) : (
-                            <span className="text-slate-500 italic">None (Floater)</span>
-                          )}
-                        </td>
+          {seats.length === 0 ? (
+            <Card className="glass border-indigo-500/20">
+              <CardContent className="flex flex-col items-center justify-center py-16 px-6 text-center">
+                <div className="w-20 h-20 rounded-full bg-indigo-500/10 flex items-center justify-center mb-6">
+                  <Armchair className="w-10 h-10 text-indigo-400" />
+                </div>
+                <h3 className="text-2xl font-bold mb-3">No Seats Configured</h3>
+                <p className="text-slate-400 mb-8 max-w-md">
+                  Get started by initializing the default seat layout. This will create 40 fixed seats (5 per squad) and 10 floater seats.
+                </p>
+                <Button 
+                  onClick={seedSeats} 
+                  disabled={loading} 
+                  size="lg"
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white px-8"
+                >
+                  <RefreshCw className={cn("w-5 h-5 mr-2", loading && "animate-spin")} />
+                  Initialize Seat Layout
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="glass border-white/5">
+              <CardHeader>
+                <CardTitle>Seat Inventory</CardTitle>
+                <CardDescription>Overview of all physical seats in the office</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm text-left">
+                    <thead className="text-xs uppercase text-slate-400 border-b border-white/10">
+                      <tr>
+                        <th className="px-6 py-4">ID</th>
+                        <th className="px-6 py-4">Number</th>
+                        <th className="px-6 py-4">Type</th>
+                        <th className="px-6 py-4">Squad Assignment</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {seats.map((seat) => (
+                        <tr key={seat.id} className="hover:bg-white/5 transition-colors">
+                          <td className="px-6 py-4 font-mono font-bold text-indigo-400">{seat.id}</td>
+                          <td className="px-6 py-4">{seat.number}</td>
+                          <td className="px-6 py-4">
+                            <Badge className={cn(
+                              seat.type === 'floater' ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/30" : "bg-indigo-500/20 text-indigo-300 border-indigo-500/30"
+                            )}>
+                              {seat.type}
+                            </Badge>
+                          </td>
+                          <td className="px-6 py-4">
+                            {seat.squadId ? (
+                              <Badge variant="outline" className="border-white/10">
+                                {SQUADS.find(s => s.id === seat.squadId)?.name || seat.squadId}
+                              </Badge>
+                            ) : (
+                              <span className="text-slate-500 italic">None (Floater)</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="system" className="space-y-6">
