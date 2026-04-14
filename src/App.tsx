@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './AuthContext';
 import { Login } from './Login';
 import { Onboarding } from './Onboarding';
-import { BookingDashboard } from '@/components/BookingDashboard';
-import { AdminPanel } from '@/components/AdminPanel';
+import { BookingDashboard } from '@/components/BookingDashboard.tsx';
+import { AdminPanel } from '@/components/AdminPanel.tsx';
 import { Toaster } from 'sonner';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button.tsx';
 import { ShieldCheck, LayoutDashboard } from 'lucide-react';
 
 const AppContent: React.FC = () => {
