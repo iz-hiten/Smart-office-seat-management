@@ -1,0 +1,96 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: userId (auth.uid)
+    // Fields:
+    //   - uid: string (required)
+    //   - name: string (required)
+    //   - email: string (required)
+    //   - squadId: string (required)
+    //   - batch: number (1 or 2)
+    //   - role: string (employee, admin)
+    //
+    // Collection: seats
+    // Document ID: seatId
+    // Fields:
+    //   - id: string
+    //   - number: number
+    //   - type: string (fixed, floater)
+    //   - squadId: string (optional)
+    //
+    // Collection: bookings
+    // Document ID: auto-generated
+    // Fields:
+    //   - date: string (YYYY-MM-DD)
+    //   - seatId: string
+    //   - userId: string
+    //   - userName: string
+    //   - status: string (booked, blocked)
+    //   - type: string (designated, floater)
+    //
+    // Collection: config
+    // Document ID: settings
+    // Fields:
+    //   - rotationStartDate: string
+    //   - holidays: list of strings
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         request.auth.token.email == "hitenmehta2006@gmail.com");
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'name', 'email', 'squadId', 'batch', 'role']) &&
+             data.uid is string && data.name is string && data.email is string &&
+             data.squadId is string && data.batch is number && data.role in ['employee', 'admin'];
+    }
+
+    function isValidBooking(data) {
+      return data.keys().hasAll(['date', 'seatId', 'userId', 'userName', 'status', 'type']) &&
+             data.date is string && data.seatId is string && data.userId is string &&
+             data.userName is string && data.status in ['booked', 'blocked'] &&
+             data.type in ['designated', 'floater'];
+    }
+
+    // Rules
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data) && request.resource.data.role == 'employee';
+      allow update: if (isOwner(userId) && request.resource.data.role == resource.data.role) || isAdmin();
+    }
+
+    match /seats/{seatId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /bookings/{bookingId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isValidBooking(request.resource.data) && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /config/settings {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+  }
+}

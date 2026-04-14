@@ -1,0 +1,60 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Employee or Admin in the system",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "name": { "type": "string", "description": "Full name" },
+        "email": { "type": "string", "description": "Work email" },
+        "squadId": { "type": "string", "description": "ID of the squad (squad_1 to squad_8)" },
+        "batch": { "type": "number", "description": "Batch 1 or Batch 2", "enum": [1, 2] },
+        "role": { "type": "string", "description": "User role", "enum": ["employee", "admin"] }
+      },
+      "required": ["uid", "name", "email", "squadId", "batch", "role"]
+    },
+    "Seat": {
+      "title": "Seat",
+      "description": "Office seat",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Seat identifier (e.g., S01)" },
+        "number": { "type": "number", "description": "Seat number" },
+        "type": { "type": "string", "description": "Fixed or Floater", "enum": ["fixed", "floater"] },
+        "squadId": { "type": "string", "description": "Assigned squad for fixed seats" }
+      },
+      "required": ["id", "number", "type"]
+    },
+    "Booking": {
+      "title": "Booking",
+      "description": "Seat booking record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Auto-generated ID" },
+        "date": { "type": "string", "format": "date", "description": "YYYY-MM-DD" },
+        "seatId": { "type": "string", "description": "ID of the seat" },
+        "userId": { "type": "string", "description": "UID of the user" },
+        "userName": { "type": "string", "description": "Name of the user" },
+        "status": { "type": "string", "description": "Booking status", "enum": ["booked", "blocked"] },
+        "type": { "type": "string", "description": "Type of booking", "enum": ["designated", "floater"] }
+      },
+      "required": ["date", "seatId", "userId", "userName", "status", "type"]
+    },
+    "Config": {
+      "title": "Config",
+      "description": "Global system configuration",
+      "type": "object",
+      "properties": {
+        "rotationStartDate": { "type": "string", "format": "date", "description": "Reference Monday for rotation" },
+        "holidays": { "type": "array", "items": { "type": "string" }, "description": "List of holiday dates YYYY-MM-DD" }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}": { "schema": "User", "description": "User profiles" },
+    "/seats/{seatId}": { "schema": "Seat", "description": "Office seats" },
+    "/bookings/{bookingId}": { "schema": "Booking", "description": "Daily bookings" },
+    "/config/settings": { "schema": "Config", "description": "Global settings" }
+  }
+}
