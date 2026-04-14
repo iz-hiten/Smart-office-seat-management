@@ -2,8 +2,8 @@ import React from 'react';
 import { signInWithPopup, GoogleAuthProvider, signInAnonymously } from 'firebase/auth';
 import { auth } from './firebase';
 import { useAuth } from './AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card';
-import { Button } from './components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { LogIn, User, ShieldAlert } from 'lucide-react';
 

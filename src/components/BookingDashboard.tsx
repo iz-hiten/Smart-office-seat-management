@@ -3,12 +3,12 @@ import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc, getDocs, 
 import { db } from '../firebase';
 import { useAuth } from '../AuthContext';
 import { Seat, Booking, UserProfile } from '../types';
-import { SeatGrid } from './SeatGrid';
+import { SeatGrid } from '@/components/SeatGrid';
 import { isDesignatedDay, formatDate, getNext7Days, canBookNextDay } from '../lib/date-utils';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Calendar as CalendarIcon, Info, LogOut, ShieldCheck, Armchair, Users } from 'lucide-react';
 import { auth } from '../firebase';
